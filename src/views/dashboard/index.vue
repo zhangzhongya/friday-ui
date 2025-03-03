@@ -9,8 +9,8 @@
                 <n-statistic :label="stat.label" :value="stat.value">
                   <template #prefix>
                     <n-icon :color="stat.trend === 'up' ? '#18a058' : '#d03050'">
-                      <trend-up-outline v-if="stat.trend === 'up'" />
-                      <trend-down-outline v-else />
+                      <ArrowUpOutline v-if="stat.trend === 'up'" />
+                      <ArrowDownOutline v-else />
                     </n-icon>
                   </template>
                 </n-statistic>
@@ -59,10 +59,23 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import { useMessage } from 'naive-ui'
   import * as echarts from 'echarts'
-  import { TrendUpOutline, TrendDownOutline } from '@vicons/ionicons5'
+  import { ArrowUpOutline, ArrowDownOutline } from '@vicons/ionicons5'
+  import {
+    NGrid,
+    NGridItem,
+    NCard,
+    NSpace,
+    NStatistic,
+    NIcon,
+    NDataTable,
+    NButton,
+    NList,
+    NListItem,
+    NProgress
+  } from 'naive-ui'
   
   // 市场统计数据
   const marketStats = ref([

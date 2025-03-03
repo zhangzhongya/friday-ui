@@ -1,85 +1,175 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <n-config-provider>
+    <n-message-provider>
+      <n-layout has-sider class="app-container">
+        <!-- 侧边栏 -->
+        <n-layout-sider
+          bordered
+          collapse-mode="width"
+          :collapsed-width="64"
+          :width="240"
+          :collapsed="collapsed"
+          show-trigger
+          @collapse="collapsed = true"
+          @expand="collapsed = false"
+        >
+          <n-menu
+            :collapsed="collapsed"
+            :collapsed-width="64"
+            :collapsed-icon-size="22"
+            :options="menuOptions"
+            :value="activeKey"
+            @update:value="handleMenuUpdate"
+          />
+        </n-layout-sider>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+        <!-- 主内容区 -->
+        <n-layout>
+          <n-layout-header bordered>
+            <div class="header-content">
+              <div class="header-title">
+                量化投资数据监测系统
+              </div>
+              <div class="header-actions">
+                <n-space>
+                  <n-button text style="font-size: 24px">
+                    <n-icon>
+                      <notification-outline />
+                    </n-icon>
+                  </n-button>
+                  <n-button text style="font-size: 24px">
+                    <n-icon>
+                      <settings-outline />
+                    </n-icon>
+                  </n-button>
+                </n-space>
+              </div>
+            </div>
+          </n-layout-header>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+          <n-layout-content class="main-content">
+            <div class="content-container">
+              <router-view></router-view>
+            </div>
+          </n-layout-content>
+        </n-layout>
+      </n-layout>
+    </n-message-provider>
+  </n-config-provider>
 </template>
 
+<script setup lang="ts">
+import { h, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import {
+  GridOutline,
+  BarChartOutline,
+  PulseOutline,
+  NotificationsOutline as NotificationOutline,
+  SettingsOutline,
+  HomeOutline,
+  StatsChartOutline,
+  AnalyticsOutline
+} from '@vicons/ionicons5'
+import {
+  NConfigProvider,
+  NMessageProvider,
+  NLayout,
+  NLayoutSider,
+  NLayoutHeader,
+  NLayoutContent,
+  NMenu,
+  NSpace,
+  NButton,
+  NIcon
+} from 'naive-ui'
+import type { Component } from 'vue'
+import type { MenuOption } from 'naive-ui'
+
+const router = useRouter()
+const collapsed = ref(false)
+const activeKey = ref<string | null>('dashboard')
+
+// 渲染图标
+function renderIcon(icon: Component) {
+  return () => h(NIcon, null, { default: () => h(icon) })
+}
+
+// 菜单配置
+const menuOptions: MenuOption[] = [
+  {
+    label: '仪表盘',
+    key: 'dashboard',
+    icon: renderIcon(HomeOutline)
+  },
+  {
+    label: '股票',
+    key: 'stock',
+    icon: renderIcon(StatsChartOutline),
+    children: [
+      {
+        label: '股票概览',
+        key: 'stock'
+      },
+      {
+        label: '股票分析',
+        key: 'stock-analysis'
+      }
+    ]
+  },
+  {
+    label: '信号监控',
+    key: 'signals',
+    icon: renderIcon(AnalyticsOutline)
+  }
+]
+
+// 处理菜单选择
+const handleMenuUpdate = (key: string | null) => {
+  activeKey.value = key
+  if (key) {
+    router.push({ name: key })
+  }
+}
+</script>
+
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.header-content {
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-nav {
+.header-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.n-layout-header {
+  height: 64px;
+  padding: 0;
+}
+
+.main-content {
+  padding: 24px;
+  background-color: #f5f6fa;
+  min-height: calc(100vh - 64px);
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  overflow-x: hidden;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.content-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  height: 100%;
 }
 </style>
